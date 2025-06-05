@@ -1,0 +1,16 @@
+{
+  "get_metadata": "sample metadata",
+  "get_current_address": "0x1000",
+  "file_entropy": 4.5,
+  "string_stats": {
+    "string_count": 1,
+    "avg_str_len": 4,
+    "max_str_len": 4
+  },
+  "functions": [
+    {
+      "name": "main",
+      "disassembly": ["mov eax, ebx", "ret"]
+    }
+  ]
+}
