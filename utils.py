@@ -58,3 +58,29 @@ def validate_yara_rule(rule_str: str) -> bool:
         return True
     except yara.Error:
         return False
+
+
+def check_false_positive_rate(rule_str: str, sample_dir: str = "benign_samples") -> float:
+    """Scan files in sample_dir with the YARA rule and return match ratio."""
+    if not os.path.isdir(sample_dir):
+        return 0.0
+
+    file_paths = [
+        os.path.join(sample_dir, name)
+        for name in os.listdir(sample_dir)
+        if os.path.isfile(os.path.join(sample_dir, name))
+    ]
+
+    if not file_paths:
+        return 0.0
+
+    compiled = yara.compile(source=rule_str)
+    matches = 0
+    for path in file_paths:
+        try:
+            if compiled.match(filepath=path):
+                matches += 1
+        except yara.Error:
+            continue
+
+    return matches / len(file_paths)
