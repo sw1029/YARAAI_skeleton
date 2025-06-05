@@ -6,7 +6,7 @@ from utils import call_openai_api
 class YaraModel:
     """Wrapper for generating YARA rules using OpenAI."""
 
-    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo") -> None:
+    def __init__(self, api_key: str, model: str = "gpt-4.1") -> None:
         self.api_key = api_key
         self.model = model
 

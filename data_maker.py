@@ -43,3 +43,19 @@ def functions_to_asm(data: Dict, out_dir: str) -> List[str]:
                 f.write(str(disasm))
         paths.append(asm_path)
     return paths
+
+
+def binary_to_json(binary_path: str, json_out: str) -> str:
+    """Convert binary file to expected JSON format.
+
+    This is a stub implementation. In practice, this should parse the binary
+    using a disassembler and output JSON with metadata and functions.
+    """
+    # TODO: implement real binary parsing logic
+    data = {
+        "get_metadata": {"path": binary_path},
+        "functions": []
+    }
+    with open(json_out, "w", encoding="utf-8") as f:
+        json.dump(data, f)
+    return json_out
