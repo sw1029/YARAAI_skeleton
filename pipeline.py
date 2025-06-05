@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Optional
 
 from assembly_api import AssemblySummaryClient
@@ -27,7 +28,15 @@ def process(
     data = load_json(json_path)
     base_prompt = build_base_prompt(data)
 
-    asm_files = functions_to_asm(data, ASM_DIR)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    json_name = os.path.splitext(os.path.basename(json_path))[0]
+    run_dir = f"{json_name}_{timestamp}"
+
+    asm_dir = os.path.join(ASM_DIR, run_dir)
+    response_dir = os.path.join(RESPONSE_DIR, run_dir)
+    result_dir = os.path.join(RESULT_DIR, run_dir)
+
+    asm_files = functions_to_asm(data, asm_dir)
 
     asm_client = AssemblySummaryClient(
         api_url=asm_api_url,
@@ -50,14 +59,14 @@ def process(
         raise ValueError("OpenAI API key required unless test_mode is True")
 
     model = YaraModel(api_key=openai_api_key) if not test_mode else None
-    os.makedirs(RESPONSE_DIR, exist_ok=True)
+    os.makedirs(response_dir, exist_ok=True)
     rule = None
     for attempt in range(1, 4):
         if test_mode:
             response = "rule test_rule { strings: $a = \"dummy\" condition: $a }"
         else:
             response = model.generate_rule(full_prompt)
-        resp_path = os.path.join(RESPONSE_DIR, f"response_{attempt}.txt")
+        resp_path = os.path.join(response_dir, f"response_{attempt}.txt")
         with open(resp_path, "w", encoding="utf-8") as f:
             f.write(response)
         parsed = parse_yara_rule(response)
@@ -74,8 +83,8 @@ def process(
     if rule is None:
         raise ValueError("Failed to parse YARA rule after 3 attempts")
 
-    os.makedirs(RESULT_DIR, exist_ok=True)
-    out_path = os.path.join(RESULT_DIR, "rule.yar")
+    os.makedirs(result_dir, exist_ok=True)
+    out_path = os.path.join(result_dir, "rule.yar")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(rule)
     return out_path
