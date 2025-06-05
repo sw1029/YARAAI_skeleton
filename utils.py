@@ -23,7 +23,7 @@ def summarize_assembly(asm_path: str, api_url: Optional[str] = None) -> str:
     return response.text.strip()
 
 
-def call_openai_api(prompt: str, api_key: str, model: str = "gpt-3.5-turbo") -> str:
+def call_openai_api(prompt: str, api_key: str, model: str = "gpt-4.1") -> str:
     """Call OpenAI chat completion API and return response text."""
     openai.api_key = api_key
     completion = openai.ChatCompletion.create(
@@ -34,9 +34,21 @@ def call_openai_api(prompt: str, api_key: str, model: str = "gpt-3.5-turbo") -> 
 
 
 def parse_yara_rule(text: str) -> Optional[str]:
-    """Extract the first YARA rule from text."""
-    match = re.search(r"(rule\s+\w+\s*\{[\s\S]*?\})", text)
-    return match.group(1) if match else None
+    """Extract the first YARA rule from text with balanced braces."""
+    start_match = re.search(r"rule\s+\w+\s*\{", text)
+    if not start_match:
+        return None
+
+    start = start_match.start()
+    brace_count = 0
+    for i in range(start, len(text)):
+        if text[i] == '{':
+            brace_count += 1
+        elif text[i] == '}':
+            brace_count -= 1
+            if brace_count == 0:
+                return text[start:i + 1]
+    return None
 
 
 def validate_yara_rule(rule_str: str) -> bool:
