@@ -17,6 +17,7 @@ def process(
     json_path: str,
     openai_api_key: Optional[str],
     asm_api_url: Optional[str] = None,
+    use_openai_asm: bool = False,
     test_mode: bool = False,
 ) -> Optional[str]:
     """Run the full pipeline for a given analysis json file.
@@ -28,7 +29,10 @@ def process(
 
     asm_files = functions_to_asm(data, ASM_DIR)
 
-    asm_client = AssemblySummaryClient(api_url=asm_api_url)
+    asm_client = AssemblySummaryClient(
+        api_url=asm_api_url,
+        openai_api_key=openai_api_key if use_openai_asm and not test_mode else None,
+    )
     summaries = [asm_client.summarize(fp) for fp in asm_files]
 
     yara_request = (
@@ -82,18 +86,30 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate YARA rule from json")
     parser.add_argument("json_path", nargs="?")
     parser.add_argument("--asm_api")
+    parser.add_argument("--openai_asm", action="store_true", help="use OpenAI for assembly summarization")
     parser.add_argument("--test", action="store_true", help="run in offline test mode")
     args = parser.parse_args()
 
     if args.test or not args.json_path:
         sample_json = os.path.join(os.path.dirname(__file__), "sample.json")
-        result = process(sample_json, openai_api_key=None, asm_api_url=args.asm_api, test_mode=True)
+        result = process(
+            sample_json,
+            openai_api_key=None,
+            asm_api_url=args.asm_api,
+            use_openai_asm=args.openai_asm,
+            test_mode=True,
+        )
     else:
         api_key = get_openai_api_key()
         if not api_key:
             raise SystemExit("OpenAI API key not configured")
 
-        result = process(args.json_path, openai_api_key=api_key, asm_api_url=args.asm_api)
+        result = process(
+            args.json_path,
+            openai_api_key=api_key,
+            asm_api_url=args.asm_api,
+            use_openai_asm=args.openai_asm,
+        )
 
     if result:
         print(f"YARA rule saved to {result}")
