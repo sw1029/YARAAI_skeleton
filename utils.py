@@ -25,12 +25,12 @@ def summarize_assembly(asm_path: str, api_url: Optional[str] = None) -> str:
 
 def call_openai_api(prompt: str, api_key: str, model: str = "gpt-4.1") -> str:
     """Call OpenAI chat completion API and return response text."""
-    openai.api_key = api_key
-    completion = openai.ChatCompletion.create(
+    client = openai.OpenAI(api_key=api_key)
+    completion = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
     )
-    return completion.choices[0].message["content"].strip()
+    return completion.choices[0].message.content.strip()
 
 
 def parse_yara_rule(text: str) -> Optional[str]:
