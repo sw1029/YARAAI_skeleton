@@ -39,7 +39,7 @@ functions
 2. functions의 경우 내부 요소를 파싱하여 .asm 확장자로 변환한다.  
 
 
-3. 별도의 api(따로 지정해 배포한 assembly 전용 요약 프로젝트)를 이용하여 .asm확장자로 변환한 assembly에 대한 자연어 설명을 얻은 뒤 기본 프롬포트에 삽입한다.
+3. 별도의 api(따로 지정해 배포한 assembly 전용 요약 프로젝트)를 이용하여 .asm확장자로 변환한 assembly에 대한 자연어 설명을 얻은 뒤 기본 프롬포트에 삽입한다. `--openai_asm` 플래그를 사용하면 OpenAI API를 이용해 요약한다.
 
 
 4. openAI api를 호출하여 프롬포트의 내용을 통해 yara rule 생성을 요청한다.
@@ -65,6 +65,7 @@ CLI 구현
 Api call
     1. openAI 인증키는 별도의 설정파일에서 관리
     2. 별도의 api(따로 지정해 배포한 assembly 전용 요약 프로젝트)는 인터페이스 형태로 추상화하여 부름. 이 때 요약 호출은 api 호출을 wrapping 하는 class를 선언하여 가시성을 높임
+    3. `--openai_asm` 플래그를 사용하면 OpenAI API(gpt-4o)로 어셈블리 요약을 수행
 ```
 
 ### Test mode

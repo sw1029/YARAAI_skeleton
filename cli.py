@@ -169,7 +169,12 @@ def preprocess_binary(path: str) -> str:
     return json_path
 
 
-def run_pipeline(input_path: str, asm_api: Optional[str], test_mode: bool = False) -> None:
+def run_pipeline(
+    input_path: str,
+    asm_api: Optional[str],
+    use_openai_asm: bool = False,
+    test_mode: bool = False,
+) -> None:
     if input_path.lower().endswith(".json"):
         json_path = input_path
     else:
@@ -183,6 +188,7 @@ def run_pipeline(input_path: str, asm_api: Optional[str], test_mode: bool = Fals
         json_path,
         openai_api_key=api_key,
         asm_api_url=asm_api,
+        use_openai_asm=use_openai_asm,
         test_mode=test_mode,
     )
     if result:
@@ -195,14 +201,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="YARA rule generation CLI")
     parser.add_argument("input_path", nargs="?")
     parser.add_argument("--asm_api")
+    parser.add_argument(
+        "--openai_asm",
+        action="store_true",
+        help="use OpenAI for assembly summarization",
+    )
     parser.add_argument("--test", action="store_true", help="run in offline test mode")
     args = parser.parse_args()
 
     if args.test or not args.input_path:
         sample_json = os.path.join(os.path.dirname(__file__), "sample.json")
-        run_pipeline(sample_json, args.asm_api, test_mode=True)
+        run_pipeline(sample_json, args.asm_api, use_openai_asm=args.openai_asm, test_mode=True)
     else:
-        run_pipeline(args.input_path, args.asm_api)
+        run_pipeline(args.input_path, args.asm_api, use_openai_asm=args.openai_asm)
 
 
 if __name__ == "__main__":
