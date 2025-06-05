@@ -124,6 +124,7 @@ assembly_api.py
         외부 api
             openai (--openai_asm 플래그)
             별도의 custom api (--asm_api)
+        api를 호출하지 않는다면 어셈블리 코드를 앞에서 일정 부분 잘라내어 프롬포트로 활용한다.
 
 config.py
     설정 및 api key 관리
