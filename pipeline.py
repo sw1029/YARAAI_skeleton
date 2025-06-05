@@ -5,8 +5,7 @@ from assembly_api import AssemblySummaryClient
 from config import get_openai_api_key
 from data_maker import build_base_prompt, functions_to_asm, load_json
 from model import YaraModel
-from utils import parse_yara_rule, validate_yara_rule
-import yara_validator  # type: ignore
+from utils import parse_yara_rule, validate_yara_rule, check_false_positive_rate
 
 
 ASM_DIR = "asm"
@@ -62,7 +61,7 @@ def process(
             continue
         if not validate_yara_rule(parsed):
             continue
-        fp_rate = yara_validator.check_false_positive_rate(parsed)
+        fp_rate = check_false_positive_rate(parsed)
         if fp_rate > 0.1:
             continue
         rule = parsed

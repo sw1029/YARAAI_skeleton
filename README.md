@@ -59,7 +59,7 @@ functions
 CLI 구현
     1. 원본 실행파일(exe, dll)인지 json 파일인지에 따라 데이터 전처리를 다르게 하여 파이프라인에 데이터 삽입.
     2. 간단한 명령어를 통하여 파이프라인 제어
-    3. 최종 결과물이 되는 yara rule의 오탐률 확인 - 이미 구현된 라이브러리를 import 하는 방식으로 검증도구 불러옴
+    3. 최종 결과물이 되는 yara rule의 오탐률을 `yara-python`으로 계산
     4. YARA rule 파싱 실패 시 최대 세 번까지 재시도하며 각 응답은 `responses/` 폴더에 저장
 
 Api call
@@ -74,5 +74,5 @@ Api call
 ## TODO - 코드에서 미구현된 부분
 ```
 * `preprocess_binary` 함수에 실제 실행파일 분석 로직 추가
-* `yara_validator` 라이브러리 실제 경로 지정 및 의존성 정리
+* `yara-python`을 이용한 오탐률 평가 로직 개선
 ```
