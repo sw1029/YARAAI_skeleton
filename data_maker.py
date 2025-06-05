@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from typing import Dict, List
 
 
@@ -29,11 +30,18 @@ def build_base_prompt(data: Dict) -> str:
     return '\n'.join(parts)
 
 
+def _sanitize_name(name: str) -> str:
+    """Return a filesystem-safe version of the function name."""
+    sanitized = re.sub(r'[<>:"/\\|?*]', '_', name)
+    sanitized = sanitized.strip()
+    return sanitized or 'func'
+
+
 def functions_to_asm(data: Dict, out_dir: str) -> List[str]:
     os.makedirs(out_dir, exist_ok=True)
     paths: List[str] = []
     for fn in data.get('functions', []):
-        name = fn.get('name', 'func')
+        name = _sanitize_name(fn.get('name', 'func'))
         asm_path = os.path.join(out_dir, f"{name}.asm")
         with open(asm_path, 'w', encoding='utf-8') as f:
             disasm = fn.get('disassembly', [])
